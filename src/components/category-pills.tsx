@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
+import { Star } from "lucide-react"
 
 interface Category {
   id: string
@@ -43,13 +44,18 @@ export function CategoryPills({ categories }: CategoryPillsProps) {
       <button
         type="button"
         onClick={() => setCat(FAVORITES_FILTER)}
-        className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+        className={`inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition ${
           selected === FAVORITES_FILTER
             ? "bg-[#974fff] text-white"
             : "bg-black/5 text-foreground hover:bg-black/10"
         }`}
       >
-        <span className="mr-1">⭐</span>
+        <Star
+          className="h-4 w-4"
+          strokeWidth={2.5}
+          fill="#974fff"
+          color={selected === FAVORITES_FILTER ? "#ffffff" : "#974fff"}
+        />
         Favorites
       </button>
       {categories.map((c) => {

@@ -56,15 +56,6 @@ export default async function TopicsPage({
 
   return (
     <PageLayout user={session.user} navbarRight={<TopicSearch />}>
-      <div className="mb-4 flex justify-end">
-        <Link
-          href="/topics/new"
-          className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-black/80 active:scale-[0.98]"
-        >
-          <Plus className="h-4 w-4" strokeWidth={2.5} />
-          Add topic
-        </Link>
-      </div>
       <CategoryPills categories={categories} />
       {topics.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground">
@@ -89,6 +80,13 @@ export default async function TopicsPage({
           ))}
         </div>
       )}
+      <Link
+        href="/topics/new"
+        aria-label="Add topic"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-lg transition hover:bg-black/80 active:scale-95 sm:bottom-8 sm:right-8"
+      >
+        <Plus className="h-6 w-6" strokeWidth={2.5} />
+      </Link>
     </PageLayout>
   )
 }
