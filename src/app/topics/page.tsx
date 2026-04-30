@@ -19,7 +19,9 @@ export default async function TopicsPage({
   const userId = session.user.id
   const { q, cat } = await searchParams
   const query = q?.trim() ?? ""
-  const categoryId = cat?.trim() ?? ""
+  const catParam = cat?.trim() ?? ""
+  const favoritesOnly = catParam === "favorites"
+  const categoryId = favoritesOnly ? "" : catParam
 
   const [topics, favorites, categories] = await Promise.all([
     prisma.topic.findMany({
@@ -28,6 +30,9 @@ export default async function TopicsPage({
           ? { title: { contains: query, mode: "insensitive" } }
           : {}),
         ...(categoryId ? { categoryId } : {}),
+        ...(favoritesOnly
+          ? { favorites: { some: { userId } } }
+          : {}),
       },
       orderBy: [{ order: "asc" }, { category: { order: "asc" } }],
       select: {
@@ -65,7 +70,9 @@ export default async function TopicsPage({
         <div className="py-12 text-center text-sm text-muted-foreground">
           {query
             ? `No topics match “${query}”.`
-            : "No topics yet — be the first to add one."}
+            : favoritesOnly
+              ? "No favorited topics yet — tap the star on any topic to add it."
+              : "No topics yet — be the first to add one."}
         </div>
       ) : (
         <div className="columns-2 sm:columns-3 lg:columns-4 gap-3">

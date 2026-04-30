@@ -226,11 +226,19 @@ export function TopicDetail({
               draggable={false}
             />
           )}
-          <h2 className="mb-5 shrink-0 text-center">
+          <h2 className="mb-2 shrink-0 text-center">
             <span className="inline-block max-w-full rounded-2xl bg-secondary px-4 py-2 text-xl font-bold leading-tight tracking-tight text-secondary-foreground shadow-lg sm:text-2xl md:text-3xl">
               {title}
             </span>
           </h2>
+          <div className="mb-4 flex shrink-0 justify-center">
+            <Link
+              href={`/topics/${topicId}/result`}
+              className="rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-black active:scale-95"
+            >
+              View Result →
+            </Link>
+          </div>
           <div className="flex-1 min-h-0">
             <SwipeDeck
               ref={deckRef}

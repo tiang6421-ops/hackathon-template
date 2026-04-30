@@ -12,6 +12,8 @@ interface CategoryPillsProps {
   categories: Category[]
 }
 
+export const FAVORITES_FILTER = "favorites"
+
 export function CategoryPills({ categories }: CategoryPillsProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -37,6 +39,18 @@ export function CategoryPills({ categories }: CategoryPillsProps) {
         }`}
       >
         All
+      </button>
+      <button
+        type="button"
+        onClick={() => setCat(FAVORITES_FILTER)}
+        className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+          selected === FAVORITES_FILTER
+            ? "bg-[#974fff] text-white"
+            : "bg-black/5 text-foreground hover:bg-black/10"
+        }`}
+      >
+        <span className="mr-1">⭐</span>
+        Favorites
       </button>
       {categories.map((c) => {
         const active = selected === c.id
