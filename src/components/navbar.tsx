@@ -53,7 +53,7 @@ export function Navbar({
         {left ?? (
           <Link href="/" className="flex items-center hover:opacity-80">
             <Image
-              src="/logo.png"
+              src="/images/logo.png"
               alt="T1nder"
               width={200}
               height={56}

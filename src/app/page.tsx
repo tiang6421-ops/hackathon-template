@@ -18,7 +18,7 @@ export default async function HomePage() {
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
         <div className="flex w-full max-w-md flex-col items-center gap-10 rounded-2xl bg-zinc-950 px-10 py-14 shadow-2xl">
           <Image
-            src="/logo.png"
+            src="/images/logo.png"
             alt="T1nder"
             width={320}
             height={96}

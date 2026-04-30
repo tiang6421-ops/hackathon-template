@@ -150,7 +150,7 @@ export function TopicDetail({
         center={
           <Link href="/topics" className="flex items-center hover:opacity-80">
             <Image
-              src="/logo.png"
+              src="/images/logo.png"
               alt="T1nder"
               width={200}
               height={56}
