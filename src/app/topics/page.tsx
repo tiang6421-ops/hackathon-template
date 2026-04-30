@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import Link from "next/link"
 import { Plus } from "lucide-react"
 import { prisma } from "@/lib/prisma"
@@ -29,6 +30,25 @@ export default async function TopicsPage({
   const catParam = cat?.trim() ?? ""
   const favoritesOnly = catParam === "favorites"
   const categoryId = favoritesOnly ? "" : catParam
+
+  const VALID_LOCALES = ["GB", "MY", "AU", "VN", "ID", "IN"] as const
+  const isValidLocale = (v: string): v is (typeof VALID_LOCALES)[number] =>
+    (VALID_LOCALES as readonly string[]).includes(v)
+
+  // URL is the source of truth; fall back to the cookie-stored preference
+  // (written by LocaleSelect) when the URL has no ?loc. Redirect so the
+  // restored locale becomes visible in the URL and shareable again.
+  if (!loc?.trim()) {
+    const stored = (await cookies()).get("tnd_locale")?.value
+    if (stored && isValidLocale(stored) && stored !== "GB") {
+      const params = new URLSearchParams()
+      if (q) params.set("q", q)
+      if (cat) params.set("cat", cat)
+      params.set("loc", stored)
+      redirect(`/topics?${params.toString()}`)
+    }
+  }
+
   const locale = loc?.trim() || "GB"
   const isUK = locale === "GB"
 

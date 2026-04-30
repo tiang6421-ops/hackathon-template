@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import {
@@ -10,19 +11,24 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const LOCALES = [
+  { code: "GB", name: "United Kingdom", flag: "gb" },
   { code: "MY", name: "Malaysia", flag: "my" },
   { code: "AU", name: "Australia", flag: "au" },
-  { code: "EN", name: "England", flag: "gb-eng" },
   { code: "VN", name: "Vietnam", flag: "vn" },
   { code: "ID", name: "Indonesia", flag: "id" },
   { code: "IN", name: "India", flag: "in" },
 ] as const
 
 type LocaleCode = (typeof LOCALES)[number]["code"]
-const DEFAULT_CODE: LocaleCode = "MY"
+const DEFAULT_CODE: LocaleCode = "GB"
+const LOCALE_COOKIE = "tnd_locale"
 
-function isLocaleCode(value: string | null): value is LocaleCode {
-  return value !== null && LOCALES.some((l) => l.code === value)
+function isLocaleCode(value: string | null | undefined): value is LocaleCode {
+  return value != null && LOCALES.some((l) => l.code === value)
+}
+
+function writeLocaleCookie(code: LocaleCode) {
+  document.cookie = `${LOCALE_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`
 }
 
 function FlagIcon({ code, name, size }: { code: string; name: string; size: number }) {
@@ -45,7 +51,14 @@ export function LocaleSelect() {
   const currentCode: LocaleCode = isLocaleCode(raw) ? raw : DEFAULT_CODE
   const current = LOCALES.find((l) => l.code === currentCode)!
 
+  // Sync URL-provided locale into the cookie so bookmarked links seed the
+  // global preference for later visits without the query param.
+  useEffect(() => {
+    if (isLocaleCode(raw)) writeLocaleCookie(raw)
+  }, [raw])
+
   const setLocale = (next: LocaleCode) => {
+    writeLocaleCookie(next)
     const params = new URLSearchParams(searchParams.toString())
     if (next === DEFAULT_CODE) params.delete("loc")
     else params.set("loc", next)
