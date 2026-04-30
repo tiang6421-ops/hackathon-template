@@ -111,9 +111,11 @@ export default async function TopicsPage({
 
   const baseTopics = isUK ? ukTopics : localisedDbTopics
 
-  // Keep the 3 pinned topics at the very top, then within the rest,
-  // move topics with an image ahead of topics without one. Preserve
-  // relative ordering on both sides of the partition (stable).
+  // Pin 3 specific topics at the top, then split the rest into 4 groups so
+  // columns 1 and 3 hold image-bearing topics and columns 2 and 4 hold the
+  // rest. CSS `columns-4` flows items top-to-bottom per column, so ordering
+  // [imagesA, nonImagesB, imagesC, nonImagesD] lines the groups up with the
+  // four visual columns on wide screens.
   const PINNED_TITLES = new Set([
     "Good Fish & chips in Kuala Lumpur",
     "Good vibes Bar in KL",
@@ -123,7 +125,19 @@ export default async function TopicsPage({
   const rest = baseTopics.filter((t) => !PINNED_TITLES.has(t.title))
   const withImage = rest.filter((t) => !!t.imageUrl)
   const withoutImage = rest.filter((t) => !t.imageUrl)
-  const topics = [...pinned, ...withImage, ...withoutImage]
+  const imgMid = Math.ceil(withImage.length / 2)
+  const nonImgMid = Math.ceil(withoutImage.length / 2)
+  const imagesA = withImage.slice(0, imgMid)
+  const imagesC = withImage.slice(imgMid)
+  const nonImagesB = withoutImage.slice(0, nonImgMid)
+  const nonImagesD = withoutImage.slice(nonImgMid)
+  const topics = [
+    ...pinned,
+    ...imagesA,
+    ...nonImagesB,
+    ...imagesC,
+    ...nonImagesD,
+  ]
   const categories = isUK ? ukCategories : dbCategories
 
   return (
