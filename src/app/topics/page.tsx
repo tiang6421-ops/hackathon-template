@@ -1,0 +1,87 @@
+import { auth } from "@/lib/auth"
+import { redirect } from "next/navigation"
+import Link from "next/link"
+import { Plus } from "lucide-react"
+import { prisma } from "@/lib/prisma"
+import { PageLayout } from "@/components/page-layout"
+import { TopicCard } from "@/components/topic-card"
+import { TopicSearch } from "@/components/topic-search"
+import { CategoryPills } from "@/components/category-pills"
+
+export default async function TopicsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; cat?: string }>
+}) {
+  const session = await auth()
+  if (!session?.user?.id) redirect("/")
+
+  const userId = session.user.id
+  const { q, cat } = await searchParams
+  const query = q?.trim() ?? ""
+  const categoryId = cat?.trim() ?? ""
+
+  const [topics, favorites, categories] = await Promise.all([
+    prisma.topic.findMany({
+      where: {
+        ...(query
+          ? { title: { contains: query, mode: "insensitive" } }
+          : {}),
+        ...(categoryId ? { categoryId } : {}),
+      },
+      orderBy: [{ category: { order: "asc" } }, { order: "asc" }],
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+        category: { select: { name: true, emoji: true } },
+      },
+    }),
+    prisma.favorite.findMany({
+      where: { userId },
+      select: { topicId: true },
+    }),
+    prisma.category.findMany({
+      orderBy: { order: "asc" },
+      select: { id: true, name: true, emoji: true },
+    }),
+  ])
+
+  const favoritedSet = new Set(favorites.map((f) => f.topicId))
+
+  return (
+    <PageLayout user={session.user} navbarRight={<TopicSearch />}>
+      <div className="mb-4 flex justify-end">
+        <Link
+          href="/topics/new"
+          className="inline-flex items-center gap-2 rounded-full bg-black px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-black/80 active:scale-[0.98]"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2.5} />
+          Add topic
+        </Link>
+      </div>
+      <CategoryPills categories={categories} />
+      {topics.length === 0 ? (
+        <div className="py-12 text-center text-sm text-muted-foreground">
+          {query
+            ? `No topics match “${query}”.`
+            : "No topics yet — be the first to add one."}
+        </div>
+      ) : (
+        <div className="columns-2 sm:columns-3 lg:columns-4 gap-3">
+          {topics.map((topic, i) => (
+            <TopicCard
+              key={topic.id}
+              id={topic.id}
+              title={topic.title}
+              imageUrl={topic.imageUrl}
+              category={topic.category}
+              index={i}
+              favorited={favoritedSet.has(topic.id)}
+            />
+          ))}
+        </div>
+      )}
+    </PageLayout>
+  )
+}

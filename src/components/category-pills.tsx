@@ -1,0 +1,61 @@
+"use client"
+
+import { useRouter, useSearchParams } from "next/navigation"
+
+interface Category {
+  id: string
+  name: string
+  emoji: string
+}
+
+interface CategoryPillsProps {
+  categories: Category[]
+}
+
+export function CategoryPills({ categories }: CategoryPillsProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const selected = searchParams.get("cat") ?? ""
+
+  const setCat = (id: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (id) params.set("cat", id)
+    else params.delete("cat")
+    const qs = params.toString()
+    router.replace(qs ? `/topics?${qs}` : "/topics")
+  }
+
+  return (
+    <div className="hide-scrollbar mb-4 flex gap-2 overflow-x-auto pb-1">
+      <button
+        type="button"
+        onClick={() => setCat("")}
+        className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+          selected === ""
+            ? "bg-black text-white"
+            : "bg-black/5 text-foreground hover:bg-black/10"
+        }`}
+      >
+        All
+      </button>
+      {categories.map((c) => {
+        const active = selected === c.id
+        return (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => setCat(c.id)}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition ${
+              active
+                ? "bg-black text-white"
+                : "bg-black/5 text-foreground hover:bg-black/10"
+            }`}
+          >
+            <span className="mr-1">{c.emoji}</span>
+            {c.name}
+          </button>
+        )
+      })}
+    </div>
+  )
+}

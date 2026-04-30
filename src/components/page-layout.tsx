@@ -1,4 +1,5 @@
 import { Navbar, NavbarUser } from "@/components/navbar"
+import type { ReactNode } from "react"
 
 interface PageLayoutProps {
   children: React.ReactNode
@@ -7,6 +8,7 @@ interface PageLayoutProps {
     email?: string | null
     image?: string | null
   } | null
+  navbarRight?: ReactNode
 }
 
 function toNavbarUser(
@@ -22,10 +24,14 @@ function toNavbarUser(
 
 const authEnabled = process.env.AUTH_ENABLED === "true"
 
-export function PageLayout({ children, user }: PageLayoutProps) {
+export function PageLayout({ children, user, navbarRight }: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar user={toNavbarUser(user)} authEnabled={authEnabled} />
+      <Navbar
+        user={toNavbarUser(user)}
+        authEnabled={authEnabled}
+        navbarRight={navbarRight}
+      />
       <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
     </div>
   )
