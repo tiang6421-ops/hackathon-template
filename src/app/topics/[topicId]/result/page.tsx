@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ExternalLink } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { Navbar } from "@/components/navbar"
 import { Card } from "@/components/ui/card"
@@ -53,6 +53,7 @@ export default async function TopicResultPage({
         id: o.id,
         text: o.text,
         imageUrl: o.imageUrl,
+        linkUrl: o.linkUrl,
         vote: o.votes[0]?.value ?? null,
         percent: Math.max(1, Math.round(raw)),
       }
@@ -121,7 +122,20 @@ export default async function TopicResultPage({
                   />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xl font-bold">{winner.text}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-xl font-bold">{winner.text}</p>
+                    {winner.linkUrl && (
+                      <a
+                        href={winner.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Open ${winner.text} in new tab`}
+                        className="shrink-0 rounded-full p-1 text-white/90 transition hover:bg-white/20 active:scale-95"
+                      >
+                        <ExternalLink className="h-4 w-4" strokeWidth={2.5} />
+                      </a>
+                    )}
+                  </div>
                   <p className="text-3xl font-extrabold tabular-nums">
                     {winner.percent}%
                   </p>
@@ -150,6 +164,17 @@ export default async function TopicResultPage({
                       <span className="truncate text-sm font-medium">
                         {o.text}
                       </span>
+                      {o.linkUrl && (
+                        <a
+                          href={o.linkUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Open ${o.text} in new tab`}
+                          className="shrink-0 rounded-full p-1 text-secondary-foreground/70 transition hover:bg-black/10 hover:text-secondary-foreground active:scale-95"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" strokeWidth={2.5} />
+                        </a>
+                      )}
                       {o.vote === true && (
                         <span className="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">
                           YES

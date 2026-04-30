@@ -9,7 +9,9 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
-type SeedOption = string | { text: string; imageUrl?: string }
+type SeedOption =
+  | string
+  | { text: string; imageUrl?: string; linkUrl?: string }
 type SeedTopic = {
   title: string
   id?: string
@@ -29,10 +31,26 @@ const CATEGORIES: SeedCategory[] = [
         imageUrl: "/images/cor-blimey.jpg",
         order: -3,
         options: [
-          { text: "Cor Blimey", imageUrl: "/images/cor-blimey.jpg" },
-          { text: "Lad & Dad", imageUrl: "/images/battered-co.jpg" },
-          { text: "Cwtch", imageUrl: "/images/Cwtch.jpg" },
-          { text: "Boys Don't Fry", imageUrl: "/images/boys-dont-fry.jpg" },
+          {
+            text: "Cor Blimey",
+            imageUrl: "/images/cor-blimey.jpg",
+            linkUrl: "https://maps.app.goo.gl/DCM91gKBpgQ6msWf6",
+          },
+          {
+            text: "Lad & Dad",
+            imageUrl: "/images/battered-co.jpg",
+            linkUrl: "https://maps.app.goo.gl/BN3a3PJhTL3EDbiU6",
+          },
+          {
+            text: "Cwtch",
+            imageUrl: "/images/Cwtch.jpg",
+            linkUrl: "https://maps.app.goo.gl/BN3a3PJhTL3EDbiU6",
+          },
+          {
+            text: "Boys Don't Fry",
+            imageUrl: "/images/boys-dont-fry.jpg",
+            linkUrl: "https://maps.app.goo.gl/wHrohNY5wkxj9AsQ7",
+          },
         ],
       },
       {
@@ -43,11 +61,17 @@ const CATEGORIES: SeedCategory[] = [
           {
             text: "Canopy Lounge Rooftop Bar KL",
             imageUrl: "/images/Canopy-Rooftop-Lounge-Bar.jpg",
+            linkUrl: "https://maps.app.goo.gl/T6s8BzHWJB59rbXp8",
           },
-          { text: "Mantra Bar KL", imageUrl: "/images/mantra-bar-kl.jpg" },
+          {
+            text: "Mantra Bar KL",
+            imageUrl: "/images/mantra-bar-kl.jpg",
+            linkUrl: "https://maps.app.goo.gl/KDNu3UCvLUuRVWeF8",
+          },
           {
             text: "The Social Desk Park",
             imageUrl: "/images/the-social-desa-parkcity.jpg",
+            linkUrl: "https://maps.app.goo.gl/kYreEBThXA4Z2Jx39",
           },
         ],
       },
@@ -750,6 +774,7 @@ async function main() {
                 return {
                   text: o.text,
                   imageUrl: o.imageUrl ?? null,
+                  linkUrl: o.linkUrl ?? null,
                   order: oIdx,
                 }
               }),

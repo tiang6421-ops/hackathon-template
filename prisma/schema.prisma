@@ -95,6 +95,7 @@ model Option {
   topicId   String
   text      String
   imageUrl  String?
+  linkUrl   String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
   topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
