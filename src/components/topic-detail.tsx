@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -52,6 +52,13 @@ export function TopicDetail({
   const [activeSection, setActiveSection] = useState<Section>("cards")
   const [favorited, setFavorited] = useState(initialFavorited)
   const [addOpen, setAddOpen] = useState(false)
+  const [progress, setProgress] = useState<{ position: number; total: number }>(
+    { position: Math.min(votedIds.length + 1, options.length), total: options.length },
+  )
+
+  const handleProgressChange = useCallback((position: number, total: number) => {
+    setProgress({ position, total })
+  }, [])
 
   useEffect(() => {
     const container = containerRef.current
@@ -160,30 +167,38 @@ export function TopicDetail({
           </Link>
         }
         right={
-          <button
-            type="button"
-            onClick={(e) => {
-              e.currentTarget.blur()
-              toggleFavorite()
-            }}
-            aria-label={favorited ? "Unfavorite" : "Favorite"}
-            aria-pressed={favorited}
-            style={{
-              color: "#974fff",
-              outline: "none",
-              boxShadow: "none",
-              appearance: "none",
-              WebkitAppearance: "none",
-              WebkitTapHighlightColor: "transparent",
-            }}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none active:scale-95"
-          >
-            <Star
-              className="h-5 w-5"
-              strokeWidth={2.5}
-              fill={favorited ? "#974fff" : "none"}
-            />
-          </button>
+          <div className="flex items-center gap-2">
+            <span
+              aria-label={`Option ${progress.position} of ${progress.total}`}
+              className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold tabular-nums text-white"
+            >
+              {progress.position}/{progress.total}
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.currentTarget.blur()
+                toggleFavorite()
+              }}
+              aria-label={favorited ? "Unfavorite" : "Favorite"}
+              aria-pressed={favorited}
+              style={{
+                color: "#974fff",
+                outline: "none",
+                boxShadow: "none",
+                appearance: "none",
+                WebkitAppearance: "none",
+                WebkitTapHighlightColor: "transparent",
+              }}
+              className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-white/10 focus:outline-none focus-visible:outline-none active:scale-95"
+            >
+              <Star
+                className="h-5 w-5"
+                strokeWidth={2.5}
+                fill={favorited ? "#974fff" : "none"}
+              />
+            </button>
+          </div>
         }
       />
 
@@ -217,6 +232,7 @@ export function TopicDetail({
               options={options}
               initialVotedIds={votedIds}
               onExhausted={() => scrollTo("stats")}
+              onProgressChange={handleProgressChange}
             />
           </div>
         </section>

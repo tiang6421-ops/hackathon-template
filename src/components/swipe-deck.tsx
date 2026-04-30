@@ -21,6 +21,7 @@ interface SwipeDeckProps {
   options: Option[]
   initialVotedIds: string[]
   onExhausted?: () => void
+  onProgressChange?: (position: number, total: number) => void
 }
 
 export interface SwipeDeckHandle {
@@ -30,7 +31,10 @@ export interface SwipeDeckHandle {
 }
 
 export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
-  function SwipeDeck({ options, initialVotedIds, onExhausted }, ref) {
+  function SwipeDeck(
+    { options, initialVotedIds, onExhausted, onProgressChange },
+    ref,
+  ) {
     const fullyVoted =
       options.length > 0 && options.every((o) => initialVotedIds.includes(o.id))
     const topCardRef = useRef<SwipeCardHandle>(null)
@@ -45,6 +49,15 @@ export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
         onExhausted?.()
       }
     }, [remaining.length, onExhausted])
+
+    useEffect(() => {
+      const total = options.length
+      const position =
+        remaining.length === 0
+          ? total
+          : total - remaining.length + 1
+      onProgressChange?.(position, total)
+    }, [remaining.length, options.length, onProgressChange])
 
     const commitSwipe = (value: boolean) => {
       const [swiped, ...rest] = remaining
