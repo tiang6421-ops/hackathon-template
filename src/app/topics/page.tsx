@@ -29,7 +29,7 @@ export default async function TopicsPage({
           : {}),
         ...(categoryId ? { categoryId } : {}),
       },
-      orderBy: [{ category: { order: "asc" } }, { order: "asc" }],
+      orderBy: [{ order: "asc" }, { category: { order: "asc" } }],
       select: {
         id: true,
         title: true,
