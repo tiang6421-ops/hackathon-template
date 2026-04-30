@@ -9,12 +9,23 @@ export const UK_ONLY_DB_TITLES = [
   "Best workshop/collaboration tools for BA work?",
 ]
 
-// Infer which locale a DB topic belongs to from its title. Returns null for
-// generic topics that should appear in every locale.
-export function getTopicLocale(title: string): "AU" | "MY" | null {
+// Infer which locale a DB topic belongs to from its title and category name.
+// Returns null for generic topics that should appear in every locale.
+export function getTopicLocale(
+  title: string,
+  categoryName?: string,
+): "AU" | "MY" | null {
   const t = title.toLowerCase()
+  const c = (categoryName ?? "").toLowerCase()
   if (/\b(brisbane|sydney|melbourne)\b/.test(t)) return "AU"
-  if (/\b(kl|penang)\b/.test(t) || /kuala lumpur/.test(t)) return "MY"
+  if (
+    /\b(kl|penang|sentral)\b/.test(t) ||
+    /kuala lumpur/.test(t) ||
+    /\bkl\b/.test(c) ||
+    c.includes("malaysia")
+  ) {
+    return "MY"
+  }
   return null
 }
 

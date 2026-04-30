@@ -85,7 +85,7 @@ export default async function TopicsPage({
   })
 
   const localisedDbTopics = dbTopics.filter((t) => {
-    const tl = getTopicLocale(t.title)
+    const tl = getTopicLocale(t.title, t.category?.name)
     return tl === null || tl === locale
   })
 
