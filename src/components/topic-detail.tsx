@@ -226,19 +226,11 @@ export function TopicDetail({
               draggable={false}
             />
           )}
-          <h2 className="mb-2 shrink-0 text-center">
+          <h2 className="mb-4 shrink-0 text-center">
             <span className="inline-block max-w-full rounded-2xl bg-secondary px-4 py-2 text-xl font-bold leading-tight tracking-tight text-secondary-foreground shadow-lg sm:text-2xl md:text-3xl">
               {title}
             </span>
           </h2>
-          <div className="mb-4 flex shrink-0 justify-center">
-            <Link
-              href={`/topics/${topicId}/result`}
-              className="rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-black active:scale-95"
-            >
-              View Result →
-            </Link>
-          </div>
           <div className="flex-1 min-h-0">
             <SwipeDeck
               ref={deckRef}
@@ -284,23 +276,33 @@ export function TopicDetail({
         </div>
       )}
 
-      <div className="shrink-0 flex items-center justify-center gap-8 py-5">
-        <button
-          type="button"
-          onClick={handleLeft}
-          aria-label={leftLabel}
-          className={`flex h-14 w-14 items-center justify-center rounded-full border-2 bg-white shadow-md transition active:scale-95 ${leftColor}`}
-        >
-          {leftIcon}
-        </button>
-        <button
-          type="button"
-          onClick={handleRight}
-          aria-label={rightLabel}
-          className={`flex h-14 w-14 items-center justify-center rounded-full border-2 bg-white shadow-md transition active:scale-95 ${rightColor}`}
-        >
-          {rightIcon}
-        </button>
+      <div className="shrink-0 flex flex-col items-center gap-3 py-5">
+        <div className="flex items-center justify-center gap-8">
+          <button
+            type="button"
+            onClick={handleLeft}
+            aria-label={leftLabel}
+            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 bg-white shadow-md transition active:scale-95 ${leftColor}`}
+          >
+            {leftIcon}
+          </button>
+          <button
+            type="button"
+            onClick={handleRight}
+            aria-label={rightLabel}
+            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 bg-white shadow-md transition active:scale-95 ${rightColor}`}
+          >
+            {rightIcon}
+          </button>
+        </div>
+        {activeSection === "cards" && (
+          <Link
+            href={`/topics/${topicId}/result`}
+            className="rounded-full bg-black/80 px-3 py-1 text-xs font-semibold text-white shadow-sm transition hover:bg-black active:scale-95"
+          >
+            View Result →
+          </Link>
+        )}
       </div>
     </div>
   )

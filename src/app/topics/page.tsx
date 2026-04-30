@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma"
 import { PageLayout } from "@/components/page-layout"
 import { TopicCard } from "@/components/topic-card"
 import { TopicSearch } from "@/components/topic-search"
+import { LocaleSelect } from "@/components/locale-select"
 import { CategoryPills } from "@/components/category-pills"
 
 export default async function TopicsPage({
@@ -55,7 +56,15 @@ export default async function TopicsPage({
   const favoritedSet = new Set(favorites.map((f) => f.topicId))
 
   return (
-    <PageLayout user={session.user} navbarRight={<TopicSearch />}>
+    <PageLayout
+      user={session.user}
+      navbarRight={
+        <>
+          <TopicSearch />
+          <LocaleSelect />
+        </>
+      }
+    >
       <CategoryPills categories={categories} />
       {topics.length === 0 ? (
         <div className="py-12 text-center text-sm text-muted-foreground">

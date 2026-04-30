@@ -92,14 +92,14 @@ if (AUTH_ENABLED) {
       const cookieStore = await cookies()
       if (!cookieStore.has("dev-session")) return null
       return {
-        user: { id: "dev", name: "Dev User", email: "dev@local" },
+        user: { id: "dev", name: "KM", email: "dev@local" },
         expires: "2099-01-01T00:00:00.000Z",
       }
     },
     signIn: async () => {
       await prisma.user.upsert({
         where: { id: "dev" },
-        create: { id: "dev", name: "Dev User", email: "dev@local" },
+        create: { id: "dev", name: "KM", email: "dev@local" },
         update: {},
       })
       const cookieStore = await cookies()

@@ -2,14 +2,11 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { signOut } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import type { ReactNode } from "react"
@@ -84,19 +81,10 @@ export function Navbar({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem disabled>{user.email}</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
-                      Sign out
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">{user.name}</span>
-                  <Link href="/api/auth/dev-signout" className={buttonVariants({ size: "sm" })}>
-                    Sign out
-                  </Link>
-                </div>
+                <span className="text-sm text-muted-foreground">{user.name}</span>
               )
             ) : null}
           </div>
