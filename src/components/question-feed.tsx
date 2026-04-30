@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react"
 import { Navbar } from "@/components/navbar"
+import { TopicHeader } from "@/components/topic-header"
 import {
   SwipeDeck,
   type SwipeDeckHandle,
@@ -21,6 +22,7 @@ import {
 interface Question {
   id: string
   title: string
+  imageUrl?: string | null
   options: { id: string; text: string }[]
   votedIds: string[]
   favorited: boolean
@@ -28,14 +30,20 @@ interface Question {
 
 interface QuestionFeedProps {
   questions: Question[]
+  topicId: string
   topicName: string
   topicEmoji: string
+  topicImageUrl?: string | null
+  topicFavorited: boolean
 }
 
 export function QuestionFeed({
   questions,
+  topicId,
   topicName,
   topicEmoji,
+  topicImageUrl,
+  topicFavorited,
 }: QuestionFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const deckRefs = useRef(new Map<string, SwipeDeckHandle | null>())
@@ -158,9 +166,13 @@ export function QuestionFeed({
           </Link>
         }
         center={
-          <p className="truncate text-sm font-semibold text-white">
-            {topicEmoji} {topicName}
-          </p>
+          <TopicHeader
+            topicId={topicId}
+            name={topicName}
+            emoji={topicEmoji}
+            imageUrl={topicImageUrl}
+            initialFavorited={topicFavorited}
+          />
         }
       />
 
@@ -188,6 +200,7 @@ export function QuestionFeed({
                 questionId={q.id}
                 options={q.options}
                 initialVotedIds={q.votedIds}
+                imageUrl={q.imageUrl}
                 onStageChange={(stage) =>
                   setStages((prev) =>
                     prev[q.id] === stage ? prev : { ...prev, [q.id]: stage },

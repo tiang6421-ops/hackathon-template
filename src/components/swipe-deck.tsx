@@ -10,23 +10,19 @@ import {
 import { AnimatePresence } from "framer-motion"
 import { SwipeCard, type SwipeCardHandle } from "@/components/swipe-card"
 import { StatsCard } from "@/components/stats-card"
-import {
-  AddOptionCard,
-  type AddOptionCardHandle,
-} from "@/components/add-option-card"
 
 interface Option {
   id: string
   text: string
 }
 
-export type SwipeDeckStage = "cards" | "add" | "stats"
+export type SwipeDeckStage = "cards" | "stats"
 
 interface SwipeDeckProps {
   questionId: string
   options: Option[]
   initialVotedIds: string[]
-  onExhausted?: () => void
+  imageUrl?: string | null
   onStageChange?: (stage: SwipeDeckStage) => void
 }
 
@@ -38,23 +34,18 @@ export interface SwipeDeckHandle {
 
 export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
   function SwipeDeck(
-    { questionId, options, initialVotedIds, onStageChange },
+    { questionId, options, initialVotedIds, imageUrl, onStageChange },
     ref,
   ) {
     const fullyVoted =
       options.length > 0 && options.every((o) => initialVotedIds.includes(o.id))
     const topCardRef = useRef<SwipeCardHandle>(null)
-    const addCardRef = useRef<AddOptionCardHandle>(null)
     const [remaining, setRemaining] = useState<Option[]>(
       fullyVoted ? [] : options,
     )
-    const [addStage, setAddStage] = useState<"pending" | "done">(
-      fullyVoted ? "done" : "pending",
-    )
     const [statsReloadKey, setStatsReloadKey] = useState(0)
 
-    const stage: SwipeDeckStage =
-      remaining.length > 0 ? "cards" : addStage === "pending" ? "add" : "stats"
+    const stage: SwipeDeckStage = remaining.length > 0 ? "cards" : "stats"
 
     useEffect(() => {
       onStageChange?.(stage)
@@ -75,10 +66,6 @@ export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
       ref,
       () => ({
         swipe: (value) => {
-          if (remaining.length === 0 && addStage === "pending") {
-            addCardRef.current?.swipe(value)
-            return
-          }
           if (remaining.length === 0) return
           const card = topCardRef.current
           if (card) {
@@ -90,32 +77,19 @@ export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
         hasRemaining: () => remaining.length > 0,
         retry: () => {
           setRemaining(options)
-          setAddStage("pending")
         },
       }),
-      [remaining, addStage, options],
+      [remaining, options],
     )
-
-    if (remaining.length === 0 && addStage === "pending") {
-      return (
-        <div className="relative mx-auto h-full w-full max-w-sm">
-          <AddOptionCard
-            ref={addCardRef}
-            questionId={questionId}
-            onSkip={() => setAddStage("done")}
-            onAdded={() => {
-              setAddStage("done")
-              setStatsReloadKey((k) => k + 1)
-            }}
-          />
-        </div>
-      )
-    }
 
     if (remaining.length === 0) {
       return (
         <div className="mx-auto h-full w-full max-w-sm">
-          <StatsCard key={statsReloadKey} questionId={questionId} />
+          <StatsCard
+            key={statsReloadKey}
+            questionId={questionId}
+            onOptionAdded={() => setStatsReloadKey((k) => k + 1)}
+          />
         </div>
       )
     }
@@ -136,6 +110,7 @@ export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
                   key={opt.id}
                   ref={isTop ? topCardRef : undefined}
                   text={opt.text}
+                  imageUrl={imageUrl}
                   stackIndex={stackIndex}
                   onSwipe={commitSwipe}
                 />

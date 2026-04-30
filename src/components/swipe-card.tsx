@@ -14,6 +14,7 @@ import {
 
 interface SwipeCardProps {
   text: string
+  imageUrl?: string | null
   stackIndex: number
   onSwipe: (value: boolean) => void
 }
@@ -25,11 +26,22 @@ export interface SwipeCardHandle {
 const SWIPE_THRESHOLD = 120
 
 export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
-  function SwipeCard({ text, stackIndex, onSwipe }, ref) {
+  function SwipeCard({ text, imageUrl, stackIndex, onSwipe }, ref) {
     const x = useMotionValue(0)
     const rotate = useTransform(x, [-250, 0, 250], [-14, 0, 14])
     const yesOpacity = useTransform(x, [0, 60, 140], [0, 0.6, 1])
     const noOpacity = useTransform(x, [-140, -60, 0], [1, 0.6, 0])
+    const borderColor = useTransform(
+      x,
+      [-140, -60, 0, 60, 140],
+      [
+        "rgb(239, 68, 68)",   // red-500 (strong NO)
+        "rgba(239, 68, 68, 0.4)",
+        "rgba(255, 255, 255, 0)",
+        "rgba(34, 197, 94, 0.4)",
+        "rgb(34, 197, 94)",   // green-500 (strong YES)
+      ],
+    )
 
     const handleDragEnd = (_: unknown, info: PanInfo) => {
       if (info.offset.x > SWIPE_THRESHOLD) {
@@ -76,12 +88,32 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
           transition: { duration: 0.2 },
         }}
       >
-        <div className="relative h-full w-full overflow-hidden rounded-3xl bg-white shadow-2xl select-none">
-          <div className="flex h-full w-full items-center justify-center p-8 text-center">
-            <p className="text-3xl font-bold leading-snug tracking-tight text-zinc-900">
-              {text}
-            </p>
-          </div>
+        <motion.div
+          className="relative h-full w-full overflow-hidden rounded-3xl border-4 bg-white shadow-2xl select-none"
+          style={isTop ? { borderColor } : { borderColor: "transparent" }}
+        >
+          {imageUrl ? (
+            <div className="flex h-full w-full flex-col">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={imageUrl}
+                alt=""
+                className="h-1/2 w-full object-cover"
+                draggable={false}
+              />
+              <div className="flex flex-1 items-center justify-center p-6 text-center">
+                <p className="text-2xl font-bold leading-snug tracking-tight text-zinc-900">
+                  {text}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-8 text-center">
+              <p className="text-3xl font-bold leading-snug tracking-tight text-zinc-900">
+                {text}
+              </p>
+            </div>
+          )}
 
           <motion.div
             className="absolute top-6 left-6 rounded-lg border-[3px] border-red-500 bg-white/90 px-3 py-1 text-2xl font-extrabold text-red-500 -rotate-12"
@@ -95,7 +127,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
           >
             YES
           </motion.div>
-        </div>
+        </motion.div>
       </motion.div>
     )
   },

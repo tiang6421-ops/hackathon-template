@@ -42,9 +42,15 @@ export default async function TopicDetailPage({
   })
   const favoritedSet = new Set(favorites.map((f) => f.questionId))
 
+  const topicFavorite = await prisma.topicFavorite.findUnique({
+    where: { userId_topicId: { userId: session.user.id, topicId } },
+    select: { id: true },
+  })
+
   const questions = topic.questions.map((q) => ({
     id: q.id,
     title: q.title,
+    imageUrl: q.imageUrl,
     options: q.options.map((o) => ({ id: o.id, text: o.text })),
     votedIds: q.options.filter((o) => votedSet.has(o.id)).map((o) => o.id),
     favorited: favoritedSet.has(q.id),
@@ -53,8 +59,11 @@ export default async function TopicDetailPage({
   return (
     <QuestionFeed
       questions={questions}
+      topicId={topic.id}
       topicName={topic.name}
       topicEmoji={topic.emoji}
+      topicImageUrl={topic.imageUrl}
+      topicFavorited={!!topicFavorite}
     />
   )
 }

@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { Plus } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 interface StatsCardProps {
   questionId: string
+  onOptionAdded?: () => void
 }
 
 interface StatOption {
@@ -15,10 +17,14 @@ interface StatOption {
   percent: number
 }
 
-export function StatsCard({ questionId }: StatsCardProps) {
+export function StatsCard({ questionId, onOptionAdded }: StatsCardProps) {
   const [stats, setStats] = useState<StatOption[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [animated, setAnimated] = useState(false)
+
+  const [newOption, setNewOption] = useState("")
+  const [adding, setAdding] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -41,6 +47,33 @@ export function StatsCard({ questionId }: StatsCardProps) {
     const id = requestAnimationFrame(() => setAnimated(true))
     return () => cancelAnimationFrame(id)
   }, [stats])
+
+  const submitOption = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const text = newOption.trim()
+    if (!text || adding) return
+    setAdding(true)
+    setAddError(null)
+    try {
+      const res = await fetch(`/api/questions/${questionId}/options`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setAddError(data.error ?? "Failed to add option")
+        setAdding(false)
+        return
+      }
+      setNewOption("")
+      setAdding(false)
+      onOptionAdded?.()
+    } catch {
+      setAddError("Network error")
+      setAdding(false)
+    }
+  }
 
   return (
     <Card className="hide-scrollbar h-full w-full overflow-y-auto rounded-3xl border-0 bg-secondary p-6 text-secondary-foreground shadow-2xl">
@@ -77,6 +110,36 @@ export function StatsCard({ questionId }: StatsCardProps) {
           ))}
         </div>
       )}
+
+      <form
+        onSubmit={submitOption}
+        className="mt-6 border-t border-black/10 pt-4"
+      >
+        <label htmlFor={`add-${questionId}`} className="mb-1 block text-xs font-semibold uppercase tracking-wide text-secondary-foreground/60">
+          Add a new option
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            id={`add-${questionId}`}
+            type="text"
+            value={newOption}
+            onChange={(e) => setNewOption(e.target.value)}
+            maxLength={140}
+            placeholder="Something we missed…"
+            className="h-9 flex-1 rounded-md border border-black/20 bg-white/80 px-3 text-sm text-black outline-none focus:border-black/40 focus:ring-2 focus:ring-black/10"
+            disabled={adding}
+          />
+          <button
+            type="submit"
+            disabled={!newOption.trim() || adding}
+            className="flex h-9 items-center gap-1 rounded-md bg-black px-3 text-sm font-medium text-white transition hover:bg-black/85 disabled:opacity-50"
+          >
+            <Plus className="h-4 w-4" strokeWidth={2.5} />
+            {adding ? "Adding…" : "Add"}
+          </button>
+        </div>
+        {addError && <p className="mt-1 text-xs text-red-600">{addError}</p>}
+      </form>
     </Card>
   )
 }
