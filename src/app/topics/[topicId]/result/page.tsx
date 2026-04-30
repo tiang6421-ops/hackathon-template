@@ -128,7 +128,7 @@ export default async function TopicResultPage({
                   </p>
                 </div>
                 <a
-                  href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                  href="https://www.youtube.com/shorts/_6HzLIJPH2A"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Open link for ${winner.text}`}
@@ -173,7 +173,7 @@ export default async function TopicResultPage({
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
                       <a
-                        href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                        href="https://www.youtube.com/shorts/_6HzLIJPH2A"
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Open link for ${o.text}`}
