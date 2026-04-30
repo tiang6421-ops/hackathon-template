@@ -27,10 +27,12 @@ Never start a second dev server outside the `app` session — port 3000 conflict
 
 Use these exact recipes. They are idempotent and match how the workspace itself starts the server.
 
+The Coder workspace injects `AUTH_ENABLED=false` into the default shell env, which forces Auth.js into a "Dev User" fallback. `~/.bashrc` exports `AUTH_ENABLED=true` to override it, but tmux's non-interactive shell does not source `.bashrc` by default — so every start/restart command below runs the server via `bash -lc` (login shell) so the rc file loads and the override sticks.
+
 **Start (only if not running):**
 
 ```bash
-tmux new-session -d -s app -c /home/coder/project 'npm run dev; exec bash' 2>/dev/null \
+tmux new-session -d -s app -c /home/coder/project 'bash -lc "npm run dev"; exec bash' 2>/dev/null \
   || tmux send-keys -t app 'cd /home/coder/project && npm run dev' Enter
 ```
 
@@ -39,7 +41,7 @@ tmux new-session -d -s app -c /home/coder/project 'npm run dev; exec bash' 2>/de
 ```bash
 tmux send-keys -t app C-c
 sleep 1
-tmux send-keys -t app 'npm run dev' Enter
+tmux send-keys -t app 'bash -lc "npm run dev"' Enter
 ```
 
 **Do not restart for code changes.** Next.js hot-reloads TSX, route, and style edits automatically. Only restart for:
