@@ -109,7 +109,21 @@ export default async function TopicsPage({
     return tl === null || tl === locale
   })
 
-  const topics = isUK ? ukTopics : localisedDbTopics
+  const baseTopics = isUK ? ukTopics : localisedDbTopics
+
+  // Keep the 3 pinned topics at the very top, then within the rest,
+  // move topics with an image ahead of topics without one. Preserve
+  // relative ordering on both sides of the partition (stable).
+  const PINNED_TITLES = new Set([
+    "Good Fish & chips in Kuala Lumpur",
+    "Good vibes Bar in KL",
+    "Best workshop/collaboration tools for BA work?",
+  ])
+  const pinned = baseTopics.filter((t) => PINNED_TITLES.has(t.title))
+  const rest = baseTopics.filter((t) => !PINNED_TITLES.has(t.title))
+  const withImage = rest.filter((t) => !!t.imageUrl)
+  const withoutImage = rest.filter((t) => !t.imageUrl)
+  const topics = [...pinned, ...withImage, ...withoutImage]
   const categories = isUK ? ukCategories : dbCategories
 
   return (
