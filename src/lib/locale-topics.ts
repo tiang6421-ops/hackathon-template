@@ -9,6 +9,15 @@ export const UK_ONLY_DB_TITLES = [
   "Best workshop/collaboration tools for BA work?",
 ]
 
+// Infer which locale a DB topic belongs to from its title. Returns null for
+// generic topics that should appear in every locale.
+export function getTopicLocale(title: string): "AU" | "MY" | null {
+  const t = title.toLowerCase()
+  if (/\b(brisbane|sydney|melbourne)\b/.test(t)) return "AU"
+  if (/\b(kl|penang)\b/.test(t) || /kuala lumpur/.test(t)) return "MY"
+  return null
+}
+
 export const UK_MOCK_TOPICS: MockTopic[] = [
   {
     id: "uk-best-workshop-collab-tools-ba",

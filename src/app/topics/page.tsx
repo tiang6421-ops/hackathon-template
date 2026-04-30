@@ -8,41 +8,50 @@ import { TopicCard } from "@/components/topic-card"
 import { TopicSearch } from "@/components/topic-search"
 import { LocaleSelect } from "@/components/locale-select"
 import { CategoryPills } from "@/components/category-pills"
+import {
+  UK_MOCK_TOPICS,
+  UK_ONLY_DB_TITLES,
+  getTopicLocale,
+  type MockTopic,
+} from "@/lib/locale-topics"
 
 export default async function TopicsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; cat?: string }>
+  searchParams: Promise<{ q?: string; cat?: string; loc?: string }>
 }) {
   const session = await auth()
   if (!session?.user?.id) redirect("/")
 
   const userId = session.user.id
-  const { q, cat } = await searchParams
+  const { q, cat, loc } = await searchParams
   const query = q?.trim() ?? ""
   const catParam = cat?.trim() ?? ""
   const favoritesOnly = catParam === "favorites"
   const categoryId = favoritesOnly ? "" : catParam
+  const locale = loc?.trim() || "GB"
+  const isUK = locale === "GB"
 
-  const [topics, favorites, categories] = await Promise.all([
-    prisma.topic.findMany({
-      where: {
-        ...(query
-          ? { title: { contains: query, mode: "insensitive" } }
-          : {}),
-        ...(categoryId ? { categoryId } : {}),
-        ...(favoritesOnly
-          ? { favorites: { some: { userId } } }
-          : {}),
-      },
-      orderBy: [{ order: "asc" }, { category: { order: "asc" } }],
-      select: {
-        id: true,
-        title: true,
-        imageUrl: true,
-        category: { select: { name: true, emoji: true } },
-      },
-    }),
+  const [dbTopics, favorites, dbCategories] = await Promise.all([
+    isUK
+      ? Promise.resolve<MockTopic[]>([])
+      : prisma.topic.findMany({
+          where: {
+            title: {
+              notIn: UK_ONLY_DB_TITLES,
+              ...(query ? { contains: query, mode: "insensitive" } : {}),
+            },
+            ...(categoryId ? { categoryId } : {}),
+            ...(favoritesOnly ? { favorites: { some: { userId } } } : {}),
+          },
+          orderBy: [{ order: "asc" }, { category: { order: "asc" } }],
+          select: {
+            id: true,
+            title: true,
+            imageUrl: true,
+            category: { select: { name: true, emoji: true } },
+          },
+        }),
     prisma.favorite.findMany({
       where: { userId },
       select: { topicId: true },
@@ -54,6 +63,34 @@ export default async function TopicsPage({
   ])
 
   const favoritedSet = new Set(favorites.map((f) => f.topicId))
+
+  const ukCategoryMap = new Map(
+    UK_MOCK_TOPICS.map((t) => [t.category.name, t.category]),
+  )
+  const ukCategories = Array.from(ukCategoryMap.values()).map((c) => ({
+    id: `uk-${c.name.toLowerCase()}`,
+    name: c.name,
+    emoji: c.emoji,
+  }))
+
+  const ukTopics = UK_MOCK_TOPICS.filter((t) => {
+    if (favoritesOnly) return false
+    if (query && !t.title.toLowerCase().includes(query.toLowerCase())) {
+      return false
+    }
+    if (categoryId && categoryId !== `uk-${t.category.name.toLowerCase()}`) {
+      return false
+    }
+    return true
+  })
+
+  const localisedDbTopics = dbTopics.filter((t) => {
+    const tl = getTopicLocale(t.title)
+    return tl === null || tl === locale
+  })
+
+  const topics = isUK ? ukTopics : localisedDbTopics
+  const categories = isUK ? ukCategories : dbCategories
 
   return (
     <PageLayout
