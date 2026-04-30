@@ -9,13 +9,7 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
-type SeedOption = string | { text: string; imageUrl?: string }
-type SeedTopic = {
-  title: string
-  id?: string
-  imageUrl?: string
-  options: SeedOption[]
-}
+type SeedTopic = { title: string; options: string[] }
 type SeedCategory = { name: string; emoji: string; topics: SeedTopic[] }
 
 const GENERIC_4 = ["Option A", "Option B", "Option C", "Option D"]
@@ -178,38 +172,6 @@ const CATEGORIES: SeedCategory[] = [
       },
     ],
   },
-  {
-    name: "Work",
-    emoji: "💼",
-    topics: [
-      {
-        id: "uk-best-workshop-collab-tools-ba",
-        title: "Best workshop/collaboration tools for BA work?",
-        imageUrl:
-          "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
-        options: [
-          {
-            text: "Monday.com",
-            imageUrl: "https://cdn.cdnlogo.com/logos/m/75/monday.svg",
-          },
-          {
-            text: "Miro",
-            imageUrl: "https://cdn.worldvectorlogo.com/logos/miro-2.svg",
-          },
-          {
-            text: "SharePoint",
-            imageUrl:
-              "https://res-1.cdn.office.net/files/fabric/assets/brand-icons/product/svg/sharepoint_48x1.svg",
-          },
-          {
-            text: "Microsoft Teams",
-            imageUrl:
-              "https://cdn.worldvectorlogo.com/logos/microsoft-teams-1.svg",
-          },
-        ],
-      },
-    ],
-  },
 ]
 
 async function main() {
@@ -228,19 +190,13 @@ async function main() {
         order: categoryIdx,
         topics: {
           create: category.topics.map((t, tIdx) => ({
-            ...(t.id ? { id: t.id } : {}),
             title: t.title,
-            imageUrl: t.imageUrl ?? null,
             order: tIdx,
             options: {
-              create: t.options.map((opt, oIdx) => {
-                const o = typeof opt === "string" ? { text: opt } : opt
-                return {
-                  text: o.text,
-                  imageUrl: o.imageUrl ?? null,
-                  order: oIdx,
-                }
-              }),
+              create: t.options.map((text, oIdx) => ({
+                text,
+                order: oIdx,
+              })),
             },
           })),
         },
