@@ -94,16 +94,13 @@ export const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
             {position}/{total}
           </div>
           {imageUrl ? (
-            <div className="flex h-full w-full flex-col">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imageUrl}
-                alt=""
-                className="h-3/5 w-full object-cover"
-                draggable={false}
-              />
-              <div className="flex flex-1 items-center justify-center p-6 text-center">
-                <p className="text-2xl font-bold leading-snug tracking-tight text-zinc-900">
+            <div
+              className="relative h-full w-full bg-zinc-100 bg-center bg-no-repeat bg-cover"
+              style={{ backgroundImage: `url(${imageUrl})` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end p-6 text-center">
+                <p className="text-2xl font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
                   {text}
                 </p>
               </div>
