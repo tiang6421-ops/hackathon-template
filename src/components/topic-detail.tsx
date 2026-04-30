@@ -68,24 +68,31 @@ export function TopicDetail({
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const sections = [
-      cardsSectionRef.current,
-      statsSectionRef.current,
-    ].filter((el): el is HTMLElement => el !== null)
+    const statsEl = statsSectionRef.current
+    const cardsEl = cardsSectionRef.current
+    if (!statsEl || !cardsEl) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries.find((e) => e.isIntersecting)
-        if (!visible) return
-        const section = (visible.target as HTMLElement).dataset
-          .section as Section | undefined
-        if (section) setActiveSection(section)
+        for (const entry of entries) {
+          const section = (entry.target as HTMLElement).dataset
+            .section as Section | undefined
+          if (!section) continue
+          if (entry.isIntersecting) {
+            if (section === "stats") {
+              router.push(`/topics/${topicId}/result`)
+              return
+            }
+            setActiveSection(section)
+          }
+        }
       },
-      { root: container, threshold: 0.6 },
+      { root: container, threshold: 0.3 },
     )
-    sections.forEach((s) => observer.observe(s))
+    observer.observe(cardsEl)
+    observer.observe(statsEl)
     return () => observer.disconnect()
-  }, [])
+  }, [router, topicId])
 
   const scrollTo = (section: Section) => {
     const el =
@@ -237,7 +244,7 @@ export function TopicDetail({
               topicId={topicId}
               options={options}
               initialVotedIds={votedIds}
-              onExhausted={() => scrollTo("stats")}
+              onExhausted={() => router.push(`/topics/${topicId}/result`)}
               onProgressChange={handleProgressChange}
               onVote={handleVote}
             />

@@ -75,7 +75,7 @@ export function TopicCard({
           />
         </button>
         <div className="flex flex-1 flex-col items-center justify-center gap-2 p-3 text-center">
-          <h3 className="text-base font-semibold leading-tight tracking-tight">
+          <h3 className="w-full text-base font-semibold leading-tight tracking-tight [overflow-wrap:anywhere] hyphens-auto">
             {title}
           </h3>
           <span className="inline-flex items-center gap-1 rounded-full bg-black/15 px-2 py-0.5 text-xs font-medium backdrop-blur-sm">
