@@ -42,17 +42,18 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  votes         Vote[]
-  favorites     Favorite[]
+  id             String           @id @default(cuid())
+  name           String?
+  email          String?          @unique
+  emailVerified  DateTime?
+  image          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  accounts       Account[]
+  sessions       Session[]
+  votes          Vote[]
+  favorites      Favorite[]
+  topicFavorites TopicFavorite[]
 }
 
 model VerificationToken {
@@ -68,18 +69,24 @@ model VerificationToken {
 // ──────────────────────────────────────────────────────────────────────────────
 
 model Topic {
-  id        String     @id @default(cuid())
-  name      String
-  emoji     String
-  order     Int        @default(0)
-  createdAt DateTime   @default(now())
-  questions Question[]
+  id             String          @id @default(cuid())
+  name           String
+  emoji          String
+  category       String?
+  imageUrl       String?
+  order          Int             @default(0)
+  createdAt      DateTime        @default(now())
+  questions      Question[]
+  topicFavorites TopicFavorite[]
+
+  @@index([category])
 }
 
 model Question {
   id        String   @id @default(cuid())
   topicId   String
   title     String
+  imageUrl  String?
   order     Int      @default(0)
   createdAt DateTime @default(now())
   topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
@@ -124,4 +131,16 @@ model Favorite {
 
   @@unique([userId, questionId])
   @@index([questionId])
+}
+
+model TopicFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  topicId   String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([topicId])
 }
