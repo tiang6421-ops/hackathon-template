@@ -14,11 +14,78 @@ type SeedTopic = {
   title: string
   id?: string
   imageUrl?: string
+  order?: number
   options: SeedOption[]
 }
 type SeedCategory = { name: string; emoji: string; topics: SeedTopic[] }
 
 const CATEGORIES: SeedCategory[] = [
+  {
+    name: "KL Recommendations",
+    emoji: "🇲🇾",
+    topics: [
+      {
+        title: "Good Fish & chips in Kuala Lumpur",
+        imageUrl: "/images/cor-blimey.jpg",
+        order: -3,
+        options: [
+          { text: "Cor Blimey", imageUrl: "/images/cor-blimey.jpg" },
+          { text: "Lad & Dad", imageUrl: "/images/battered-co.jpg" },
+          { text: "Cwtch", imageUrl: "/images/Cwtch.jpg" },
+          { text: "Boys Don't Fry", imageUrl: "/images/boys-dont-fry.jpg" },
+        ],
+      },
+      {
+        title: "Good vibes Bar in KL",
+        imageUrl: "/images/Canopy-Rooftop-Lounge-Bar.jpg",
+        order: -2,
+        options: [
+          {
+            text: "Canopy Lounge Rooftop Bar KL",
+            imageUrl: "/images/Canopy-Rooftop-Lounge-Bar.jpg",
+          },
+          { text: "Mantra Bar KL", imageUrl: "/images/mantra-bar-kl.jpg" },
+          {
+            text: "The Social Desk Park",
+            imageUrl: "/images/the-social-desa-parkcity.jpg",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: "Work",
+    emoji: "💼",
+    topics: [
+      {
+        id: "uk-best-workshop-collab-tools-ba",
+        title: "Best workshop/collaboration tools for BA work?",
+        imageUrl:
+          "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
+        order: -1,
+        options: [
+          {
+            text: "Monday.com",
+            imageUrl: "https://cdn.cdnlogo.com/logos/m/75/monday.svg",
+          },
+          {
+            text: "Miro",
+            imageUrl: "https://cdn.worldvectorlogo.com/logos/miro-2.svg",
+          },
+          {
+            text: "SharePoint",
+            imageUrl:
+              "https://res-1.cdn.office.net/files/fabric/assets/brand-icons/product/svg/sharepoint_48x1.svg",
+          },
+          {
+            text: "Microsoft Teams",
+            imageUrl:
+              "https://cdn.worldvectorlogo.com/logos/microsoft-teams-1.svg",
+          },
+        ],
+      },
+    ],
+  },
   {
     name: "Events & Seasonal",
     emoji: "🌸",
@@ -518,38 +585,6 @@ const CATEGORIES: SeedCategory[] = [
     ],
   },
   {
-    name: "Work",
-    emoji: "💼",
-    topics: [
-      {
-        id: "uk-best-workshop-collab-tools-ba",
-        title: "Best workshop/collaboration tools for BA work?",
-        imageUrl:
-          "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80",
-        options: [
-          {
-            text: "Monday.com",
-            imageUrl: "https://cdn.cdnlogo.com/logos/m/75/monday.svg",
-          },
-          {
-            text: "Miro",
-            imageUrl: "https://cdn.worldvectorlogo.com/logos/miro-2.svg",
-          },
-          {
-            text: "SharePoint",
-            imageUrl:
-              "https://res-1.cdn.office.net/files/fabric/assets/brand-icons/product/svg/sharepoint_48x1.svg",
-          },
-          {
-            text: "Microsoft Teams",
-            imageUrl:
-              "https://cdn.worldvectorlogo.com/logos/microsoft-teams-1.svg",
-          },
-        ],
-      },
-    ],
-  },
-  {
     name: "KL Sentral",
     emoji: "🚉",
     topics: [
@@ -687,37 +722,6 @@ const CATEGORIES: SeedCategory[] = [
       },
     ],
   },
-  {
-    name: "KL Recommendations",
-    emoji: "🇲🇾",
-    topics: [
-      {
-        title: "Best Fish & Chips in KL?",
-        imageUrl: "/images/cor-blimey.jpg",
-        options: [
-          { text: "Cor Blimey", imageUrl: "/images/cor-blimey.jpg" },
-          { text: "Lad & Dad", imageUrl: "/images/battered-co.jpg" },
-          { text: "Cwtch", imageUrl: "/images/Cwtch.jpg" },
-          { text: "Boys Don't Fry", imageUrl: "/images/boys-dont-fry.jpg" },
-        ],
-      },
-      {
-        title: "Best bars with good vibes in KL?",
-        imageUrl: "/images/Canopy-Rooftop-Lounge-Bar.jpg",
-        options: [
-          {
-            text: "Canopy Lounge Rooftop Bar KL",
-            imageUrl: "/images/Canopy-Rooftop-Lounge-Bar.jpg",
-          },
-          { text: "Mantra Bar KL", imageUrl: "/images/mantra-bar-kl.jpg" },
-          {
-            text: "The Social Desk Park",
-            imageUrl: "/images/the-social-desa-parkcity.jpg",
-          },
-        ],
-      },
-    ],
-  },
 ]
 
 async function main() {
@@ -739,7 +743,7 @@ async function main() {
             ...(t.id ? { id: t.id } : {}),
             title: t.title,
             imageUrl: t.imageUrl ?? null,
-            order: tIdx,
+            order: t.order ?? tIdx,
             options: {
               create: t.options.map((opt, oIdx) => {
                 const o = typeof opt === "string" ? { text: opt } : opt
