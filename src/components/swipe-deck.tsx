@@ -22,6 +22,7 @@ interface SwipeDeckProps {
   initialVotedIds: string[]
   onExhausted?: () => void
   onProgressChange?: (position: number, total: number) => void
+  onVote?: (optionId: string, value: boolean) => void
 }
 
 export interface SwipeDeckHandle {
@@ -32,7 +33,7 @@ export interface SwipeDeckHandle {
 
 export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
   function SwipeDeck(
-    { options, initialVotedIds, onExhausted, onProgressChange },
+    { options, initialVotedIds, onExhausted, onProgressChange, onVote },
     ref,
   ) {
     const fullyVoted =
@@ -63,6 +64,7 @@ export const SwipeDeck = forwardRef<SwipeDeckHandle, SwipeDeckProps>(
       const [swiped, ...rest] = remaining
       if (!swiped) return
       setRemaining(rest)
+      onVote?.(swiped.id, value)
       void fetch("/api/votes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -55,9 +55,14 @@ export function TopicDetail({
   const [progress, setProgress] = useState<{ position: number; total: number }>(
     { position: Math.min(votedIds.length + 1, options.length), total: options.length },
   )
+  const [sessionVotes, setSessionVotes] = useState<Record<string, boolean>>({})
 
   const handleProgressChange = useCallback((position: number, total: number) => {
     setProgress({ position, total })
+  }, [])
+
+  const handleVote = useCallback((optionId: string, value: boolean) => {
+    setSessionVotes((prev) => ({ ...prev, [optionId]: value }))
   }, [])
 
   useEffect(() => {
@@ -106,6 +111,7 @@ export function TopicDetail({
   const handleLeft = () => {
     if (activeSection === "cards") deckRef.current?.swipe(false)
     else {
+      setSessionVotes({})
       deckRef.current?.retry()
       scrollTo("cards")
     }
@@ -233,6 +239,7 @@ export function TopicDetail({
               initialVotedIds={votedIds}
               onExhausted={() => scrollTo("stats")}
               onProgressChange={handleProgressChange}
+              onVote={handleVote}
             />
           </div>
         </section>
@@ -246,6 +253,8 @@ export function TopicDetail({
             <StatsCard
               ref={statsRef}
               topicId={topicId}
+              options={options}
+              sessionVotes={sessionVotes}
               onAddClick={() => setAddOpen(true)}
             />
           </div>

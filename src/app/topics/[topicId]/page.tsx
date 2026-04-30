@@ -21,12 +21,6 @@ export default async function TopicDetailPage({
 
   if (!topic) notFound()
 
-  const userVotes = await prisma.vote.findMany({
-    where: { userId, option: { topicId } },
-    select: { optionId: true },
-  })
-  const votedSet = new Set(userVotes.map((v) => v.optionId))
-
   const favorite = await prisma.favorite.findUnique({
     where: { userId_topicId: { userId, topicId } },
     select: { id: true },
@@ -42,9 +36,7 @@ export default async function TopicDetailPage({
         text: o.text,
         imageUrl: o.imageUrl,
       }))}
-      votedIds={topic.options
-        .filter((o) => votedSet.has(o.id))
-        .map((o) => o.id)}
+      votedIds={[]}
       favorited={!!favorite}
     />
   )
